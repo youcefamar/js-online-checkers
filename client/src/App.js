@@ -48,6 +48,7 @@ function App() {
     if (!game) {
       setGame({
         board: [],
+        chat: [],
       });
     } else {
       setGame(game);
@@ -55,13 +56,19 @@ function App() {
   }, [games, gameId]);
 
   const leaveGame = () => {
-    setGame(PAGE_LOBBY);
+    setPage(PAGE_LOBBY);
     socket.emit('leave-game');
   };
 
-  const createGame = (name) => {
-    socket.emit('create-game', name);
-    setPage(PAGE_GAME);
+  const createGame = (name, playAgainstAI = false) => {
+    socket.emit('create-game', { name, aiOpponent: playAgainstAI });
+    setTimeout(() => {
+      setPage(PAGE_GAME);
+    }, 100);
+   // socket.once('your-game-created', (gameId) => {
+    //  setGameId(gameId);
+    //  setPage(PAGE_GAME);
+    //});
   };
 
   const sendChat = (message) => {
@@ -72,20 +79,26 @@ function App() {
     const newSocket = io('http://localhost:4000', {
       transports: ['websocket'],
     });
+    
     newSocket.on('disconnect', () => {
       setGameId(null);
       setColor('');
       setPage(PAGE_LOBBY);
-
-      alert('The server crashed or restarted');
+      setShowModal(true);
+      setModalTitle('Connection Lost');
+      setModalText('The server connection was lost. Please refresh the page.');
     });
+    
     newSocket.on('games', (games) => {
       setGames(games);
     });
+    
     newSocket.on('your-game-created', (gameId) => {
       setGameId(gameId);
     });
+    
     newSocket.on('color', (color) => setColor(color));
+    
     newSocket.on('end-game', () => {
       setGameId(null);
       setColor('');
@@ -94,13 +107,36 @@ function App() {
       setModalText('Your opponent has left the game');
       setModalTitle('Game Over');
     });
+    
     newSocket.on('winner', (winner) => {
-      alert(`${winner} has won the game!`);
+      setShowModal(true);
+      setModalTitle('Game Over');
+      setModalText(`${winner.toUpperCase()} has won the game!`);
+      
+      // After a short delay, return to lobby
+      setTimeout(() => {
+        setGameId(null);
+        setColor('');
+        setPage(PAGE_LOBBY);
+      }, 3000);
     });
+    
     setSocket(newSocket);
+    
+    // Cleanup on unmount
+    return () => {
+      if (newSocket) {
+        newSocket.disconnect();
+      }
+    };
   }, []);
 
   const handleCloseModal = () => setShowModal(false);
+
+  const handleBackToLobby = () => {
+    setPage(PAGE_LOBBY);
+    handleCloseModal();
+  };
 
   return (
     <>
@@ -127,13 +163,14 @@ function App() {
             {page === PAGE_CREATE_NEW_GAME && (
               <CreateNewGame createGame={createGame} />
             )}
-            {page === PAGE_GAME && game && (
+            {page === PAGE_GAME && (
               <Game
                 color={color}
                 game={game}
                 leaveGame={leaveGame}
                 movePiece={movePiece}
                 sendChat={sendChat}
+                socket ={socket}
               />
             )}
           </Col>
@@ -147,7 +184,7 @@ function App() {
         <Modal.Footer>
           <Button
             variant="primary"
-            onClick={handleCloseModal}
+            onClick={handleBackToLobby}
           >
             OK
           </Button>

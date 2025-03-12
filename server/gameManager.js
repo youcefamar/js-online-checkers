@@ -2,12 +2,19 @@ let nextGameId = 0;
 
 const movePiece = require('./movePiece');
 
+const { getBestMove } = require('./aiBot');//adding aibot
 const games = [];
 
 const getGameForPlayer = (player) => {
-  return games.find((g) =>
-    g.players.find((p) => p.socket === player)
-  );
+  const game = games.find((g) => g.players.find((p) => p.socket === player));
+  
+  if (!game) {
+    console.error("Error: No game found for player", player);
+    console.log("Current Games:", games);
+    return null;
+  }
+
+  return game;
 };
 
 exports.getGames = () =>
@@ -15,11 +22,11 @@ exports.getGames = () =>
     const { players, ...game } = g;
     return {
       ...game,
+      aiOpponent: g.aiOpponent, // Explicitly include the AI opponent flag
       numberOfPlayers: players.length,
     };
   });
-
-exports.createGame = ({ player, name }) => {
+exports.createGame = ({ player, name ,aiOpponent = false}) => {
   const game = {
     name,
     turn: 'red',
@@ -29,6 +36,7 @@ exports.createGame = ({ player, name }) => {
         color: 'red',
       },
     ],
+    aiOpponent,//add ai flag
     chat: [],
     id: nextGameId++,
     board: [
@@ -41,30 +49,41 @@ exports.createGame = ({ player, name }) => {
       [2, 0, 2, 0, 2, 0, 2, 0],
       [0, 2, 0, 2, 0, 2, 0, 2],
     ],
-    // board: [
-    //   [0, 0, 0, 0, 0, 0, 0, 0],
-    //   [0, 0, 0, 0, 0, 0, 0, 0],
-    //   [0, 0, 0, 0, 0, 0, 0, 0],
-    //   [0, 0, 0, 0, 0, 0, 0, 0],
-    //   [0, 0, 1, 0, 0, 0, 0, 0],
-    //   [0, 2, 0, 0, 0, 0, 0, 0],
-    //   [0, 0, 0, 0, 0, 0, 0, 0],
-    //   [0, 0, 0, 0, 0, 0, 0, 0],
-    // ],
   };
+
+  if (aiOpponent) {
+    game.players.push({ socket: "AI", color: "black" });  //AI is auto-joined
+}
+
+
   games.push(game);
+  console.log("Game Created:", game); // Debugging line
   return game;
 };
+exports.createAIGame = ({ player, name }) => {
+  const game = exports.createGame({ player, name, aiOpponent: true });
 
+  if (!game || !game.board) {
+    console.error("Error: AI game was not created correctly!", game);
+    return null;
+  }
+
+  return game;
+};
 exports.movePiece = ({
   player,
   selectedPiece,
   destination,
+  game
 }) => {
-  const game = getGameForPlayer(player);
-  movePiece({ game, destination, selectedPiece });
+  // If a game object is passed directly, use it (for AI moves)
+  // Otherwise find the game for the player
+  const currentGame = game || getGameForPlayer(player);
+  if (!currentGame) return null;
+  
+  movePiece({ game: currentGame, destination, selectedPiece });
+  return currentGame;
 };
-
 exports.getGameById = (gameId) =>
   exports.getGames().find((g) => g.id === gameId);
 
@@ -82,17 +101,28 @@ exports.addPlayerToGame = ({ player, gameId }) => {
 exports.endGame = ({ player, winner }) => {
   const game = getGameForPlayer(player);
   // players might disconnect while in the lobby
-  if (!game) return;
-  games.splice(games.indexOf(game), 1);
+  if (!game) {
+    console.error("❌ Tried to end a game, but no game found!", player);
+    return;}
+    console.log("Ending game:", game);
+    if (!game.aiOpponent) {  // ✅ Multiplayer games can be removed
+      games.splice(games.indexOf(game), 1);
+    }
   game.players.forEach((currentPlayer) => {
+   if(currentPlayer.socket !== "AI"){
     if (player !== currentPlayer.socket)
       currentPlayer.socket.emit('end-game');
     if (winner) currentPlayer.socket.emit('winner', winner);
+   }
   });
 };
+
 exports.isGameOver = ({ player }) => {
   const game = getGameForPlayer(player);
-
+  if (!game || !game.board) {
+    console.error("Error: Trying to check game over, but game is missing!", game);
+    return false; // ✅ Safe return instead of crashing
+  }
   let redCount = 0;
   let blackCount = 0;
   for (let i = 0; i < game.board.length; i++) {
@@ -111,6 +141,7 @@ exports.isGameOver = ({ player }) => {
       }
     }
   }
+  console.log("Checking game over state: Red =", redCount, ", Black =", blackCount);
   if (redCount === 0) {
     return 'black';
   } else if (blackCount === 0) {
@@ -124,3 +155,4 @@ exports.addChatMessage = ({ player, message }) => {
   const game = getGameForPlayer(player);
   game.chat.push(message);
 };
+exports.getGameForPlayer = getGameForPlayer;

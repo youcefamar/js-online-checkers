@@ -11,7 +11,7 @@ const leaveGameFactory = require('./handlers/leaveGameFactory');
 const createGameFactory = require('./handlers/createGameFactory');
 const joinGameFactory = require('./handlers/joinGameFactory');
 const chatMessageFactory = require('./handlers/chatMessageFactory');
-
+const { getGameById } = require('./gameManager');
 const sendGames = require('./helpers/sendGames');
 
 io.on('connection', (socket) => {
@@ -37,6 +37,14 @@ io.on('connection', (socket) => {
   );
 
   socket.on('join-game', joinGameFactory({ io, socket }));
+
+  socket.on('get-game', (gameId) => {
+    const game = getGameById(gameId);
+    if (game) {
+      socket.emit('game-details', game);
+    }
+  });
+  
 });
 
 http.listen(4000, () => {
