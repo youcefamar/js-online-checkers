@@ -15,10 +15,10 @@ const movePieceFactory = ({ io, socket }) => ({ selectedPiece, destination }) =>
     const winner = isGameOver({ player: socket });
 
     if (winner !== false) {
-        console.log("✅ Game Over Detected! Winner:", winner);
+        console.log("Game Over Detected! Winner:", winner);
         endGame({ player: socket, winner });
     } else if (game && game.aiOpponent && game.turn === 'black') {
-        console.log("✅ Game is NOT over, continuing play.");
+        console.log("Game is NOT over, continuing play.");
         console.log("AI turn detected, making move...");
 
         setTimeout(() => {
@@ -43,7 +43,7 @@ const movePieceFactory = ({ io, socket }) => ({ selectedPiece, destination }) =>
                 if (aiWinner !== false) {
                     endGame({ player: socket, winner: aiWinner });
                 } else {
-                    console.log("✅ AI move applied. Sending updated game state...");
+                    console.log("AI move applied. Sending updated game state...");
                     const safeGame = {
                         ...game,
                         players: game.players.map(p => ({ color: p.color })),
@@ -66,7 +66,7 @@ const movePieceFactory = ({ io, socket }) => ({ selectedPiece, destination }) =>
                         
                         if (jumpMoves.length > 0) {
                             setTimeout(() => {
-                                console.log("🔄 AI is making a follow-up jump move...");
+                                //console.log("AI is making a follow-up jump move...");
                                 
                                 // Get the best jump
                                 const bestJump = jumpMoves[0]; // Or add logic to select the best one

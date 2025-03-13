@@ -20,7 +20,7 @@ io.on('connection', (socket) => {
   socket.on(
     'disconnect',
     onDisconnectFactory({ io, socket })
-    //console.log(socket.i)
+    
   );
 
   socket.on('move-piece', movePieceFactory({ io, socket }));

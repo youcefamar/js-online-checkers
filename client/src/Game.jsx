@@ -38,9 +38,9 @@ export default function Game({ leaveGame, movePiece, game, color, sendChat,socke
   useEffect(() => {
     if(!socket) return;
     socket.on('game-updated', (updatedGame) => {
-      console.log("✅ Received game update in frontend", updatedGame);
+      console.log(" Received game update in frontend", updatedGame);
         if (updatedGame.id === gameState.id) {
-            console.log("✅ Game updated:", updatedGame);
+            console.log("Game updated:", updatedGame);
             setGame({ ...updatedGame });  // Update the board after AI moves
         }
     });

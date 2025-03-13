@@ -4,7 +4,7 @@ const RED_QUEEN = 3;
 const BLACK_QUEEN = 4;
 const MAX_DEPTH = 6;
 
-// Enhanced to return detailed information about the board
+//return detailed information about the board
 function evaluateBoard(board) {
     let score = 0;
     let redCount = 0;
@@ -45,10 +45,9 @@ function evaluateBoard(board) {
     };
 }
 
-// Fixed to properly handle captures and prioritize capturing moves
 function getValidMoves(board, playerColor, currentPos = null, jumped = []) {
     let moves = [];
-    let captureMoves = []; // Separate array for capture moves
+    let captureMoves = [];
     
     const isPiecePlayerColor = (piece) => {
         if (playerColor === 'red') {
@@ -58,7 +57,7 @@ function getValidMoves(board, playerColor, currentPos = null, jumped = []) {
         }
     };
 
-    // Debug info for tracking pieces and their possible moves
+   
     let piecesFound = 0;
     
     for (let i = 0; i < board.length; i++) {
@@ -73,7 +72,7 @@ function getValidMoves(board, playerColor, currentPos = null, jumped = []) {
             const isQueen = piece === RED_QUEEN || piece === BLACK_QUEEN;
             const directions = [];
             
-            // Fixed direction logic - ensure queens get all directions
+           
             if (piece === RED_PAWN) {
                 directions.push({ di: 1, dj: 1 }, { di: 1, dj: -1 });
             } else if (piece === BLACK_PAWN) {
@@ -90,7 +89,7 @@ function getValidMoves(board, playerColor, currentPos = null, jumped = []) {
 
             let pieceMoves = 0;
             
-            // First check for capture moves
+   
             for (const dir of directions) {
                 const di1 = i + dir.di;
                 const dj1 = j + dir.dj;
@@ -120,7 +119,7 @@ function getValidMoves(board, playerColor, currentPos = null, jumped = []) {
                                 newBoard, 
                                 playerColor, 
                                 { i: di2, j: dj2 }, 
-                                []  // Reset jumped list since we're using a new board state
+                                []  
                             );
                             
                             // Filter to only include jump sequences
@@ -140,7 +139,7 @@ function getValidMoves(board, playerColor, currentPos = null, jumped = []) {
                 }
             }
             
-            // If no captures, check for regular moves
+        
             if (jumped.length === 0) {  // Only add regular moves if not in the middle of a jump sequence
                 for (const dir of directions) {
                     const maxSteps = isQueen ? 7 : 1;
@@ -163,7 +162,7 @@ function getValidMoves(board, playerColor, currentPos = null, jumped = []) {
         }
     }
 
-    // Debug logging
+ 
     const debugInfo = {
         playerColor,
         piecesFound,
@@ -179,7 +178,7 @@ function getValidMoves(board, playerColor, currentPos = null, jumped = []) {
     return result;
 }
 
-// Fixed to handle multi-jumps correctly
+
 function applyMove(board, move) {
     let newBoard = JSON.parse(JSON.stringify(board));
     const piece = newBoard[move.from.i][move.from.j];
@@ -203,7 +202,7 @@ function applyMove(board, move) {
     return newBoard;
 }
 
-// Enhanced minimax with better handling of terminal positions and promotion bonus
+//minimax with better handling of terminal positions and promotion bonus
 function minimax(board, depth, isMaximizing, alpha, beta) {
     // Evaluate current board state
     const evaluation = evaluateBoard(board);
@@ -420,7 +419,7 @@ function getBestMove(board) {
     const randomIndex = Math.floor(Math.random() * bestMoves.length);
     return bestMoves[randomIndex];
 }
-
+/*
 // Utility function to analyze surroundings of a piece
 function getSurroundings(board, i, j) {
     const surroundings = [];
@@ -444,7 +443,7 @@ function getSurroundings(board, i, j) {
     
     return surroundings;
 }
-
+/*
 // Helper function to print board state for debugging
 function printBoard(board) {
     let result = "";
@@ -462,7 +461,7 @@ function printBoard(board) {
         result += row + "\n";
     }
     return result;
-}
+}*/
 
 module.exports = { 
     getBestMove, 

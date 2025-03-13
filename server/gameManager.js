@@ -102,10 +102,10 @@ exports.endGame = ({ player, winner }) => {
   const game = getGameForPlayer(player);
   // players might disconnect while in the lobby
   if (!game) {
-    console.error("❌ Tried to end a game, but no game found!", player);
+    console.error("Tried to end a game, but no game found!", player);
     return;}
     console.log("Ending game:", game);
-    if (!game.aiOpponent) {  // ✅ Multiplayer games can be removed
+    if (!game.aiOpponent) {  //Multiplayer games can be removed
       games.splice(games.indexOf(game), 1);
     }
   game.players.forEach((currentPlayer) => {
@@ -121,7 +121,7 @@ exports.isGameOver = ({ player }) => {
   const game = getGameForPlayer(player);
   if (!game || !game.board) {
     console.error("Error: Trying to check game over, but game is missing!", game);
-    return false; // ✅ Safe return instead of crashing
+    return false; //Safe return instead of crashing
   }
   let redCount = 0;
   let blackCount = 0;
