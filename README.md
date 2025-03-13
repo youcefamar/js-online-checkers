@@ -29,7 +29,7 @@ This is a real-time online checkers game that allows players to compete against 
 ### 1. Clone the Repository
 ```sh
 git clone https://github.com/youcefamar/js-online-checkers.git
-cd online-checkers
+you can use vscode or just run it on your terminal 
 ```
 ### 2. Backend Setup
 ```sh
