@@ -86,15 +86,37 @@ The React app will start on `http://localhost:3000`.
 
 ---
 
-## AI Logic (Minimax)
-The AI opponent uses the **Minimax algorithm with alpha-beta pruning** to make optimal moves. The AI:
-- Evaluates the board to assign scores to positions.
-- Simulates possible future moves up to a certain depth.
-- Picks the best move based on calculated outcomes.
+## AI Logic (file aiBot.js)
 
----
-
-## Future Improvements
-- Add user authentication.
-- Enhance AI difficulty levels.
-- Improve UI animations and effects.
+1. Board Evaluation (evaluateBoard function)
+Assigns a score based on the number and type of pieces on the board.
+Pawns are worth 5 points, queens are worth 10 points.
+Additional points are given to pawns that are closer to promotion (i.e., reaching the last row).
+2. Finding Valid Moves (getValidMoves function)
+Identifies all possible moves for a given player.
+Ensures moves follow the game rules (e.g., diagonal movement, capturing opponents).
+Handles multi-jumps (chains of captures in a single turn).
+3. Applying Moves (applyMove function)
+Simulates moving a piece to a new position.
+Removes captured pieces from the board.
+Promotes pawns to queens if they reach the opposite end of the board.
+4. Minimax Algorithm (minimax function)
+Recursive decision-making function that simulates different future game states.
+Alternates between maximizing (AI's turn) and minimizing (opponent's turn).
+Uses alpha-beta pruning to optimize performance by cutting off unnecessary calculations.
+Evaluates board states at a depth of 5 moves ahead.
+5. Choosing the Best Move (getBestMove function)
+Calls minimax on all valid moves.
+Picks the move with the highest evaluated score.
+Adds bonuses for captures and promotions.
+6. AI Turn Execution
+When it's AI's turn (black), the game calls getBestMove.
+The AI selects and makes the optimal move.
+If the AI can make multiple jumps, it continues until no more jumps are available.
+Example of AI Move Execution Flow
+Player moves a piece.
+If it's the AI's turn, getBestMove is called.
+AI evaluates possible moves using Minimax.
+The best move is applied.
+If a jump is available, AI continues moving.
+The updated game state is sent back to the frontend.
