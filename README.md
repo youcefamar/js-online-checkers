@@ -95,7 +95,6 @@ Additional points are given to pawns that are closer to promotion (i.e., reachin
 2. Finding Valid Moves (getValidMoves function)
 Identifies all possible moves for a given player.
 Ensures moves follow the game rules (e.g., diagonal movement, capturing opponents).
-Handles multi-jumps (chains of captures in a single turn).
 3. Applying Moves (applyMove function)
 Simulates moving a piece to a new position.
 Removes captured pieces from the board.
@@ -112,7 +111,6 @@ Adds bonuses for captures and promotions.
 6. AI Turn Execution
 When it's AI's turn (black), the game calls getBestMove.
 The AI selects and makes the optimal move.
-If the AI can make multiple jumps, it continues until no more jumps are available.
 Example of AI Move Execution Flow
 Player moves a piece.
 If it's the AI's turn, getBestMove is called.
