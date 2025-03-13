@@ -35,29 +35,67 @@ module.exports = ({ game, destination, selectedPiece }) => {
 
   // black pawn can't move down
   if (piece === BLACK_PAWN && di >= i) return;
-  // can only move 1 or 2 slots
-  if (Math.abs(distanceI) > 2) return;
+  
+  // determine the max move distance based on piece type
+  const maxMoveDistance = (piece === RED_QUEEN || piece === BLACK_QUEEN) ? 7 : 2;
+  
+  // can only move up to maxMoveDistance slots
+  if (Math.abs(distanceI) > maxMoveDistance) return;
 
-  if (Math.abs(distanceI) === 2) {
-    // check if jumping a piece
-    const middlePiece =
-      game.board[oneCellForwardI][oneCellForwardJ];
-    if (middlePiece === 0) return;
-    if (middlePiece !== piece) {
-      game.board[oneCellForwardI][oneCellForwardJ] = 0;
-    } else {
-      return;
+  // Check if jumping a piece when moving 2 or more slots
+  if (Math.abs(distanceI) >= 2) {
+    // For each step along the diagonal path
+    let checkI = i;
+    let checkJ = j;
+    let jumpedCount = 0;
+    
+    for (let step = 1; step < Math.abs(distanceI); step++) {
+      checkI += Math.sign(distanceI);
+      checkJ += Math.sign(distanceJ);
+      
+      const cellContent = game.board[checkI][checkJ];
+      
+      // If cell is empty, continue for queens, fail for pawns
+      if (cellContent === 0) {
+        if (piece === RED_PAWN || piece === BLACK_PAWN) {
+          return; // Pawns can't jump over empty spaces
+        }
+        continue;
+      }
+      
+      // Can't jump over your own pieces
+      const isPlayerPiece = 
+        ((piece === RED_PAWN || piece === RED_QUEEN) && 
+         (cellContent === RED_PAWN || cellContent === RED_QUEEN)) ||
+        ((piece === BLACK_PAWN || piece === BLACK_QUEEN) && 
+         (cellContent === BLACK_PAWN || cellContent === BLACK_QUEEN));
+         
+      if (isPlayerPiece) {
+        return;
+      }
+      
+      // Can't jump over more than one piece at a time (unless it's a queen)
+      jumpedCount++;
+      if (jumpedCount > 1 && (piece === RED_PAWN || piece === BLACK_PAWN)) {
+        return;
+      }
+      
+      // If it's a valid jump, clear the jumped piece
+      game.board[checkI][checkJ] = 0;
     }
   }
 
+  // Move the piece
   game.board[di][dj] = game.board[i][j];
   game.board[i][j] = 0;
 
+  // Handle promotion
   if (piece === RED_PAWN && di === BOTTOM_ROW) {
     game.board[di][dj] = RED_QUEEN;
   } else if (piece === BLACK_PAWN && di === TOP_ROW) {
     game.board[di][dj] = BLACK_QUEEN;
   }
 
+  // Change turn
   game.turn = game.turn === 'red' ? 'black' : 'red';
 };
