@@ -33,7 +33,7 @@ cd online-checkers
 ```
 ### 2. Backend Setup
 ```sh
-cd backend
+cd server
 npm install
 npm start
 ```
@@ -41,7 +41,7 @@ The backend server will start on `http://localhost:4000`.
 
 ### 3. Frontend Setup
 ```sh
-cd ../frontend
+cd ../client
 npm install
 npm start
 ```
@@ -56,9 +56,7 @@ The React app will start on `http://localhost:3000`.
 4. Make your moves and enjoy the game!
 
 ---
-
 ## Project Structure
-
 ### Backend (`backend/`)
 - `server.js` - Main Express & WebSocket server.
 - `gameManager.js` - Manages game state.
@@ -100,11 +98,3 @@ The AI opponent uses the **Minimax algorithm with alpha-beta pruning** to make o
 - Add user authentication.
 - Enhance AI difficulty levels.
 - Improve UI animations and effects.
-
----
-
-## Contributors
-- **Your Name** (GitHub: [yourusername](https://github.com/yourusername))
-
-## License
-This project is licensed under the MIT License.
